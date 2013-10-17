@@ -2,11 +2,7 @@ fabric
 flask
 nose
 mock
-celery
 redis
-celery-with-redis
 uwsgi
-flask-wtf
-gevent-websocket
 flask-script
 flask-restful

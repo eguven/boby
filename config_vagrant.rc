@@ -5,9 +5,6 @@ BUILD_KEY_FILENAME = "~/.vagrant.d/insecure_private_key"
 REDIS_HOST = "192.168.3.201"
 REDIS_PORT = "6379"
 
-# celery
-BROKER_URL = 'redis://' + REDIS_HOST + ':' + REDIS_PORT + '/0'
-
 # flask
 
 SERVER_NAME = "192.168.3.1:5000"

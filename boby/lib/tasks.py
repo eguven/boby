@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 from fabric.api import settings, env
-from celery import Celery
 import os
 import sys
 import imp
@@ -29,9 +28,6 @@ with open(config) as config_file:
     dd.__file__ = config_file.name
     exec(compile(config_file.read(), config_file.name, 'exec'), dd.__dict__)
 
-celery = Celery()
-celery.add_defaults(dd)
-
 # get settings
 key_filename = None if not hasattr(dd, "BUILD_KEY_FILENAME") else dd.BUILD_KEY_FILENAME
 host = dd.BUILD_HOST
@@ -49,7 +45,6 @@ def send_notification(data):
     red = Redis(dd.REDIS_HOST, int(dd.REDIS_PORT))
     red.publish("all", ['publish', data])
 
-@celery.task
 def package_build_process(name, url, branch, path_to_missile=None,
                           domain=None, stack=None):
     """

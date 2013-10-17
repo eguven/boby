@@ -17,11 +17,6 @@ To launch the webserver:
     
 It can also run as a uwsgi app.
 
-To launch the celery consumer:
-
-    $ cd boby
-    $ GACHETTE_SETTINGS=./config_vagrant.rc celery -A gachette_web.tasks worker -l debug --purge
-
 You will need to have an instance of Redis running as well and configured in the `config.rc` file.
 By using `config_vagrant`, you will actually use the one in Bidasse/Vagrant VM.
 
