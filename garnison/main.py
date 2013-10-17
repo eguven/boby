@@ -1,6 +1,5 @@
 
 from flask import Flask
-from flask.ext.bootstrap import Bootstrap
 from flask.ext.restful import Api
 
 from garnison.lib.resources import add_resources
@@ -17,9 +16,6 @@ def create_app(config_file=None, debug=False):
     app.debug = debug
     if config_file:
         app.config.from_pyfile(config_file)
-
-    # attach Bootstrap plugin
-    Bootstrap(app)
 
     # register blueprints
     app.register_blueprint(web_bp)

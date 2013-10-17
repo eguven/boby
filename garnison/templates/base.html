@@ -1,5 +1,12 @@
-{% extends "bootstrap/base.html" %}
+<!DOCTYPE html>
+<head>
+  <title>{% block title %}{% endblock title%}</title>
+  <link href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet" media="screen">
+  {% block styles %}{% endblock styles %}
+  {% block head_append %}{% endblock head_append %}
+</head>
 
+<body>
 
 {% block navbar %}
 <nav class="navbar navbar-default navbar-inverse" role="navigation">
@@ -11,42 +18,16 @@
   <!-- Collect the nav links, forms, and other content for toggling -->
   <div class="collapse navbar-collapse navbar-ex1-collapse">
     <ul class="nav navbar-nav">
-        {#
-        <li class="active"><a href="{{ url_for('garnison-web.home') }}">Home</a></li>
-        <li><a href="{{ url_for('gachette-web-build.build_create') }}">Build</a></li>
-        #}
-        <li class="active"><a href="{{ url_for('garnison-web.dashboard')}}">Dashboard</a></li>
-        <li><a href="#">Deploy</a></li>
-        <li><a href="#">Status</a></li>
+        <li><a href="{{ url_for('garnison-web.dashboard')}}">Dashboard</a></li>
       </ul>
   </div><!-- /.navbar-collapse -->
 
 </nav>
-{% endblock %}
+{% endblock navbar %}
 
-{% block content %}
-<!-- <div class="container-fluid">
-  <div class="row-fluid">
-
-    <div class="span8"> -->
-
-      <div id="messages-wrap">
-      {% for category, msg in get_flashed_messages(with_categories=true) %}
-        <p class="alert flash-{{ category }}">
-          <button type="button" class="close" data-dismiss="alert">&times;</button>
-          {{ msg }}
-        </p>
-      {% endfor %}
-      </div>
-<div class="container">
-      {% block container_content %}{% endblock %}
-</div>
-<!--     </div>
-
-    <div class="span4 log">
-    </div>
-
-  </div>
-  <hr>
-</div> -->
-{% endblock content %}
+{% block content %}{% endblock content %}
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.0.0/js/bootstrap.min.js"></script>
+{% block scripts %}{% endblock scripts %}
+</body>
+</html>

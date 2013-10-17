@@ -7,7 +7,6 @@ redis
 celery-with-redis
 uwsgi
 flask-wtf
-flask-bootstrap
 gevent-websocket
 la-gachette
 flask-script
