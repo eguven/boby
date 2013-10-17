@@ -8,6 +8,5 @@ celery-with-redis
 uwsgi
 flask-wtf
 gevent-websocket
-la-gachette
 flask-script
 flask-restful

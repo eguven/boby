@@ -186,20 +186,11 @@ class RedisBackend(object):
         s["packages"][pkg_name] = pkg_version
         self.update_stack(domain, stack, packages=s["packages"])
 
-    def get_latest_version(self, package, return_base=None):
+    def get_latest_version(self, package):
         keys = self.redis.keys("packages:%s:*" % package)
         if not keys:
             return ""
-        full_version = max(keys).split(":")[2]
-        if return_base is None:
-            return full_version
-        return full_version.split("rev")[0]
-
-    def get_new_base_version(self, package):
-        latest = self.get_latest_version(package, return_base=True)
-        if not latest:
-            return "1"
-        return str(1 + int(latest))
+        return max(keys).split(":")[2]
 
     # BUILDS
 

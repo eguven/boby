@@ -7,10 +7,8 @@ import imp
 import datetime
 from redis import Redis
 
-from gachette.lib.working_copy import WorkingCopy
-from gachette.lib.stack import Stack
+from .working_copy import WorkingCopy
 
-from .operator import StackOperatorRedis
 from .backends import RedisBackend
 
 # allow the usage of ssh config file by fabric
@@ -67,17 +65,16 @@ def package_build_process(name, url, branch, path_to_missile=None,
         print arg , ": ", locals()[arg]
 
     with settings(host_string=host, key_filename=key_filename):
-        wc = WorkingCopy(name, base_folder="/var/gachette")
-        wc.prepare_environment()
-        wc.checkout_working_copy(url=url, branch=branch)
+        wc = WorkingCopy(name, base_folder="/var/gachette", repo=url)
+        wc.prepare(branch=branch)
 
         latest_version = RedisBackend().get_latest_version(name)
-        new_base_version = RedisBackend().get_new_base_version(name)
-        new_version = wc.get_version_from_git(base_version=new_base_version)
+        new_base_version = wc.generate_new_base_version(latest_version)
+
+        new_version = wc.get_new_git_version(prefix=new_base_version, suffix=branch)
         # skipping existing build removed
-        new_version += "-%s" % branch
-        wc.set_version(app=new_version, env=new_version, service=new_version)
-        result = wc.build(output_path="/var/gachette/debs", path_to_missile=path_to_missile)
+        wc.set_version(new_version)
+        result = wc.build(path_to_missile=path_to_missile, output_path="/var/gachette/debs")
         RedisBackend().delete_lock("packages", name)
         RedisBackend().create_package(name, new_version, result)
         print "Built new:", name, branch, new_version
@@ -85,12 +82,3 @@ def package_build_process(name, url, branch, path_to_missile=None,
     if domain is not None and stack is not None:
         RedisBackend().add_stack_package(domain, stack, name, new_version)
         print "Added to 'domains:%s:stacks:%s:packages' as {'%s': '%s'}" % (domain, stack, name, new_version)
-
-@celery.task
-def add_package_to_stack_process(domain, stack, name, version, file_name):
-    """
-    Add built package to the stack.
-    """
-    with settings(host_string=host, key_filename=key_filename):
-        s = Stack(domain, stack, meta_path="/var/gachette/", operator=StackOperatorRedis(redis_host=dd.REDIS_HOST))
-        s.add_package(name, version=version, file_name=file_name)
