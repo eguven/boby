@@ -1,9 +1,8 @@
-
 from flask import Flask
 from flask.ext.restful import Api
 
-from garnison.lib.resources import add_resources
-from garnison.web import bp as web_bp
+from .lib.resources import add_resources
+from .web import bp as web_bp
 
 
 def create_app(config_file=None, debug=False):

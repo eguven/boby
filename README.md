@@ -1,4 +1,4 @@
-garnison
+boby
 ========
 
 Web interface for the package building and deployment tool.
@@ -8,8 +8,8 @@ Installation
 
 To launch the webserver:
 
-    $ cd garnison
-    $ mkvirtualenv garnison
+    $ cd boby
+    $ mkvirtualenv boby
     $ # libevent install is required on OsX
     $ # can be installed through homebrew (recommended) or macports
     $ pip install --upgrade -r requirements.pip
@@ -19,7 +19,7 @@ It can also run as a uwsgi app.
 
 To launch the celery consumer:
 
-    $ cd garnison
+    $ cd boby
     $ GACHETTE_SETTINGS=./config_vagrant.rc celery -A gachette_web.tasks worker -l debug --purge
 
 You will need to have an instance of Redis running as well and configured in the `config.rc` file.

@@ -2,7 +2,7 @@
 import os
 from flask.ext.script import Server, Manager, Shell
 
-from garnison.main import create_app
+from boby.main import create_app
 
 
 # configuration from env var

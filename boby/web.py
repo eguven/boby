@@ -1,6 +1,6 @@
 from flask import Blueprint, current_app, render_template
 
-bp = Blueprint('garnison-web', __name__, template_folder="templates")
+bp = Blueprint('boby-web', __name__, template_folder="templates")
 
 
 @bp.route('/')
