@@ -10,8 +10,8 @@ from redis import Redis
 from gachette.lib.working_copy import WorkingCopy
 from gachette.lib.stack import Stack
 
-from operator import StackOperatorRedis
-from garnison_api.backends import RedisBackend
+from .operator import StackOperatorRedis
+from .backends import RedisBackend
 
 # allow the usage of ssh config file by fabric
 env.use_ssh_config = True

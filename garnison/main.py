@@ -1,10 +1,10 @@
-import os
-from flask import Flask, current_app, render_template
-from flask.ext.bootstrap import Bootstrap
 
-from garnison.web import bp as web_bp
-from garnison_api.resources import add_resources
+from flask import Flask
+from flask.ext.bootstrap import Bootstrap
 from flask.ext.restful import Api
+
+from garnison.lib.resources import add_resources
+from garnison.web import bp as web_bp
 
 
 def create_app(config_file=None, debug=False):

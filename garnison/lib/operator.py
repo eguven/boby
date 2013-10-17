@@ -4,7 +4,7 @@ import json
 import redis
 
 from exceptions import *
-from garnison_api.backends import RedisBackend
+from .backends import RedisBackend
 
 class StackOperatorRedis(object):
     """

@@ -4,8 +4,7 @@ import flask
 from flask import Flask, request
 from flask.ext.restful import Resource, abort, reqparse
 
-from gachette_web.tasks import package_build_process
-
+from .tasks import package_build_process
 from .backends import RedisBackend
 
 PROJECTS_DATA = {

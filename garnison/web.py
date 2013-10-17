@@ -8,7 +8,6 @@ def home():
     """
     Test. Return status of the builds.
     """
-    print "toto"
     for rule in current_app.url_map.iter_rules():
         # Filter out rules we can't navigate to in a browser
         # and rules that require parameters
