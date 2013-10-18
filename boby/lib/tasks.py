@@ -64,6 +64,7 @@ def package_build_process(name, url, branch, path_to_missile=None,
         new_version = wc.get_new_git_version(prefix=new_base_version, suffix=branch)
         # skipping existing build removed
         wc.set_version(new_version)
+        path_to_missile = os.path.join(wc.working_copy, path_to_missile)
         result = wc.build(path_to_missile=path_to_missile, output_path="/home/buildbot/build/debs")
         RedisBackend().delete_lock("packages", name)
         RedisBackend().create_package(name, new_version, result)

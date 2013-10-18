@@ -1,10 +1,11 @@
 import json
 import os
 
-from fabric.api import local, run, cd
+from fabric.api import local, run, lcd
 
 if os.environ.get("FABRIC_PATCH_LOCAL"):
     local = run
+    lcd = cd
 
 class WorkingCopy(object):
     """
@@ -38,7 +39,7 @@ class WorkingCopy(object):
         cmd = "test -d %(dir)s/.git || git clone --depth=50 --quiet %(url)s %(dir)s"
         local(cmd % {"dir": self.working_copy, "url": repo})
 
-        with cd(self.working_copy):
+        with lcd(self.working_copy):
             local("git fetch --quiet origin")
             local("git reset --quiet --hard origin/%s" % branch)
             local("git submodule --quiet init")
@@ -55,7 +56,7 @@ class WorkingCopy(object):
         """
         Return the hash of the current HEAD commit of this working copy.
         """
-        with cd(self.working_copy):
+        with lcd(self.working_copy):
             return local("git rev-parse --verify --short HEAD")
 
     def get_new_git_version(self, prefix="", suffix=""):
