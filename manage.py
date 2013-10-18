@@ -1,8 +1,12 @@
 #!/usr/bin/env python
 import os
+
+import redis
 from flask.ext.script import Server, Manager, Shell
 
 from boby.main import create_app
+from boby.lib.backends import RedisBackend
+from boby.lib.utils import bootstrap_packages
 
 
 # configuration from env var
@@ -27,6 +31,19 @@ def dump_config():
     "Pretty print the config"
     for key in sorted(app.config.iterkeys()):
         print "%s: %s" % (key, app.config[key])
+
+@manager.command
+def cleanup_redis():
+    from boby.lib.utils import import_config
+    import_config()
+    r = RedisBackend().redis
+    r.delete(*r.keys())
+
+@manager.command
+def bootstrap_domain(domain):
+    if not RedisBackend().domain_exists(domain):
+        RedisBackend().create_domain(domain)
+    RedisBackend().update_domain(domain, available_packages=bootstrap_packages().keys())
 
 if __name__ == "__main__":
     manager.run()

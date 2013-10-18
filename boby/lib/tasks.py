@@ -2,13 +2,13 @@
 from fabric.api import settings, env
 import os
 import sys
-import imp
 import datetime
 from redis import Redis
 
-from .working_copy import WorkingCopy
-
 from .backends import RedisBackend
+from .working_copy import WorkingCopy
+from .utils import import_config
+
 
 # allow the usage of ssh config file by fabric
 env.use_ssh_config = True
@@ -21,12 +21,7 @@ import pprint
 pp = pprint.PrettyPrinter(indent=2)
 
 # load config from file via environ variable
-config = os.environ.get('BOBY_SETTINGS', './config.rc')
-dd = imp.new_module('config')
-
-with open(config) as config_file:
-    dd.__file__ = config_file.name
-    exec(compile(config_file.read(), config_file.name, 'exec'), dd.__dict__)
+dd = import_config()
 
 # get settings
 key_filename = None if not hasattr(dd, "BUILD_KEY_FILENAME") else dd.BUILD_KEY_FILENAME

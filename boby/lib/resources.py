@@ -6,6 +6,7 @@ from flask.ext.restful import Resource, abort, reqparse
 
 from .tasks import package_build_process
 from .backends import RedisBackend
+from .utils import bootstrap_packages
 
 PROJECTS_DATA = {
     'test_config': {
@@ -18,8 +19,7 @@ PROJECTS_DATA = {
     },
 }
 
-def push_projects(domain):
-    RedisBackend().update_domain(domain, available_packages=PROJECTS_DATA.keys())
+PROJECTS_DATA.update(bootstrap_packages())
 
 class BaseResource(Resource):
     def __init__(self, *args, **kwargs):

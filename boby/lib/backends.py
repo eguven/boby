@@ -1,17 +1,12 @@
 import datetime
-import imp
+import functools
 import json
 import os
 import redis
 
-import functools
+from .utils import import_config
 
-config = os.environ.get('BOBY_SETTINGS', './config.rc')
-dd = imp.new_module(config)
-
-with open(config) as config_file:
-    dd.__file__ = config_file.name
-    exec(compile(config_file.read(), config_file.name, 'exec'), dd.__dict__)
+dd = import_config()
 
 class RedisBackend(object):
     """
