@@ -3,8 +3,8 @@ import os
 
 from fabric.api import local, run, cd
 
-# for TESTING, TODO remove
-local = run
+if os.environ.get("FABRIC_PATCH_LOCAL"):
+    local = run
 
 class WorkingCopy(object):
     """
