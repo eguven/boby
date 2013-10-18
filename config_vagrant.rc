@@ -1,6 +1,7 @@
 # fabric
 BUILD_HOST = "vagrant@192.168.3.201"
 BUILD_KEY_FILENAME = "~/.vagrant.d/insecure_private_key"
+BUILD_LOGPATH = "~/build/logs"
 
 REDIS_HOST = "192.168.3.201"
 REDIS_PORT = "6379"
@@ -14,5 +15,3 @@ BOOTSTRAP_FONTAWESOME = True
 SECRET_KEY = 'sdfdsfdsfs2322323dsfdf'
 CSRF_ENABLED = False
 CSRF_SESSION_KEY = "dsvdfd fdfvdffdvfdfgfdgfdg"
-
-BUILD_LOGPATH = "/tmp/gachette_log"

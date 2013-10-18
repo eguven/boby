@@ -6,7 +6,7 @@ from boby.main import create_app
 
 
 # configuration from env var
-config_file = os.environ['GACHETTE_SETTINGS']
+config_file = os.environ['BOBY_SETTINGS']
 config_file = os.path.realpath(os.path.expanduser(config_file)) 
 print "config_file: ", config_file
 

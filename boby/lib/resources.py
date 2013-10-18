@@ -18,6 +18,9 @@ PROJECTS_DATA = {
     },
 }
 
+def push_projects(domain):
+    RedisBackend().update_domain(domain, available_packages=PROJECTS_DATA.keys())
+
 class BaseResource(Resource):
     def __init__(self, *args, **kwargs):
         super(Resource, self).__init__(*args, **kwargs)

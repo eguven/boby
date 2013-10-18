@@ -21,7 +21,7 @@ import pprint
 pp = pprint.PrettyPrinter(indent=2)
 
 # load config from file via environ variable
-config = os.environ.get('GACHETTE_SETTINGS', './config.rc')
+config = os.environ.get('BOBY_SETTINGS', './config.rc')
 dd = imp.new_module('config')
 
 with open(config) as config_file:
@@ -51,7 +51,7 @@ def package_build_process(name, url, branch, path_to_missile=None,
     Prepare working copy, checkout working copy, build
     """
     logfilename = "build-%s-%s-%s.log" % (name, branch, datetime.datetime.utcnow().isoformat())
-    logfilepath = os.path.join(dd.BUILD_LOGPATH, logfilename)
+    logfilepath = os.path.expanduser(os.path.join(dd.BUILD_LOGPATH, logfilename))
     sys.stdout = open(logfilepath, "w")
     sys.stderr = sys.stdout
 
@@ -60,7 +60,7 @@ def package_build_process(name, url, branch, path_to_missile=None,
         print arg , ": ", locals()[arg]
 
     with settings(host_string=host, key_filename=key_filename):
-        wc = WorkingCopy(name, base_folder="/var/gachette", repo=url)
+        wc = WorkingCopy(name, base_folder="/home/buildbot/build", repo=url)
         wc.prepare(branch=branch)
 
         latest_version = RedisBackend().get_latest_version(name)
@@ -69,7 +69,7 @@ def package_build_process(name, url, branch, path_to_missile=None,
         new_version = wc.get_new_git_version(prefix=new_base_version, suffix=branch)
         # skipping existing build removed
         wc.set_version(new_version)
-        result = wc.build(path_to_missile=path_to_missile, output_path="/var/gachette/debs")
+        result = wc.build(path_to_missile=path_to_missile, output_path="/home/buildbot/build/debs")
         RedisBackend().delete_lock("packages", name)
         RedisBackend().create_package(name, new_version, result)
         print "Built new:", name, branch, new_version

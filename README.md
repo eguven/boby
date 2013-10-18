@@ -13,7 +13,7 @@ To launch the webserver:
     $ # libevent install is required on OsX
     $ # can be installed through homebrew (recommended) or macports
     $ pip install --upgrade -r requirements.pip
-    $ GACHETTE_SETTINGS=./config_vagrant.rc ./manage.py runserver
+    $ BOBY_SETTINGS=./config_vagrant.rc ./manage.py runserver
     
 It can also run as a uwsgi app.
 

@@ -6,7 +6,7 @@ import redis
 
 import functools
 
-config = os.environ.get('GACHETTE_SETTINGS', './config.rc')
+config = os.environ.get('BOBY_SETTINGS', './config.rc')
 dd = imp.new_module(config)
 
 with open(config) as config_file:
