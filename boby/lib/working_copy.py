@@ -1,11 +1,8 @@
 import json
 import os
+from subprocess import call, check_output
 
-from fabric.api import local, run, lcd
-
-if os.environ.get("FABRIC_PATCH_LOCAL"):
-    local = run
-    lcd = cd
+from .utils import CD
 
 class WorkingCopy(object):
     """
@@ -13,8 +10,10 @@ class WorkingCopy(object):
     checking out correct branches and setting versions before calling
     le-trebuchet for the build
     """
-    def __init__(self, name, base_folder="/var/CIC/", repo=None):
+    def __init__(self, name, base_folder=None, repo=None):
         self.name = name
+        if base_folder is None:
+            base_folder = os.path.expanduser("~/build")
         self.base_folder = base_folder
         self.repo = repo
         self.working_copy = os.path.join(self.base_folder, "working_copy", self.name)
@@ -27,9 +26,9 @@ class WorkingCopy(object):
         """
         Create/clean the directory for the repo if necessary
         """
-        local("test -d %(dir)s || mkdir -p %(dir)s" % {"dir": self.working_copy})
+        call("test -d %(dir)s || mkdir -p %(dir)s" % {"dir": self.working_copy}, shell=True)
         if clean:
-            local("rm -rf %(dir)s/*" % {"dir": self.working_copy})
+            call("rm -rf %(dir)s/*" % {"dir": self.working_copy}, shell=True)
 
     def _checkout_working_copy(self, repo, branch):
         """
@@ -37,14 +36,15 @@ class WorkingCopy(object):
         Returns the long SHA of the branch's HEAD.
         """
         cmd = "test -d %(dir)s/.git || git clone --depth=50 --quiet %(url)s %(dir)s"
-        local(cmd % {"dir": self.working_copy, "url": repo})
+        # local(cmd % {"dir": self.working_copy, "url": repo})
+        call(cmd % {"dir": self.working_copy, "url": repo}, shell=True)
 
-        with lcd(self.working_copy):
-            local("git fetch --quiet origin")
-            local("git reset --quiet --hard origin/%s" % branch)
-            local("git submodule --quiet init")
-            local("git submodule --quiet update")
-            return local('git rev-parse HEAD')
+        # with lcd(self.working_copy):
+        with CD(self.working_copy):
+            call("git fetch --quiet origin", shell=True)
+            call("git reset --quiet --hard origin/%s" % branch, shell=True)
+            call("git submodule --quiet init", shell=True)
+            call("git submodule --quiet update", shell=True)
 
     def prepare(self, repo=None, branch="master", clean=False):
         repo = repo if repo is not None else self.repo
@@ -56,8 +56,10 @@ class WorkingCopy(object):
         """
         Return the hash of the current HEAD commit of this working copy.
         """
-        with lcd(self.working_copy):
-            return local("git rev-parse --verify --short HEAD")
+        # with lcd(self.working_copy):
+        with CD(self.working_copy):
+            return check_output("git rev-parse --verify --short HEAD", shell=True).strip()
+            # return local("git rev-parse --verify --short HEAD")
 
     def get_new_git_version(self, prefix="", suffix=""):
         """
@@ -95,8 +97,9 @@ class WorkingCopy(object):
             path_to_missile = self.default_missile_path
         version = self._build_version_legacy(self.version)
         cmd = "trebuchet build %(missile)s --arch amd64 --output %(output)s %(version)s"
-        results = local(cmd % {"missile": path_to_missile, "output": output_path,
-                               "version": version})
+        results = check_output(cmd % {"missile": path_to_missile, "output": output_path,
+                               "version": version},
+                               shell=True)
         retval = []
         for pkg in filter(lambda l: l.startswith("Built: "), results.split("\n")):
             retval.append(json.loads("""%s""" % pkg[7:].replace("'", '"')))

@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-from fabric.api import settings, env
 import os
 import sys
 import datetime
@@ -8,14 +7,6 @@ from redis import Redis
 from .backends import RedisBackend
 from .working_copy import WorkingCopy
 from .utils import import_config
-
-
-# allow the usage of ssh config file by fabric
-env.use_ssh_config = True
-env.forward_agent = True
-env.warn_only = True
-# env.echo_stdin = False
-env.always_use_pty = False
 
 import pprint
 pp = pprint.PrettyPrinter(indent=2)
@@ -54,21 +45,23 @@ def package_build_process(name, url, branch, path_to_missile=None,
     for arg in args:
         print arg , ": ", locals()[arg]
 
-    with settings(host_string=host, key_filename=key_filename):
-        wc = WorkingCopy(name, base_folder="/home/buildbot/build", repo=url)
-        wc.prepare(branch=branch)
+    # with settings(host_string=host, key_filename=key_filename):
+    wc = WorkingCopy(name, base_folder=os.path.expanduser("~/build"), repo=url)
+    wc.prepare(branch=branch)
 
-        latest_version = RedisBackend().get_latest_version(name)
-        new_base_version = wc.generate_new_base_version(latest_version)
+    latest_version = RedisBackend().get_latest_version(name)
+    new_base_version = wc.generate_new_base_version(latest_version)
 
-        new_version = wc.get_new_git_version(prefix=new_base_version, suffix=branch)
-        # skipping existing build removed
-        wc.set_version(new_version)
+    new_version = wc.get_new_git_version(prefix=new_base_version, suffix=branch)
+    # skipping existing build removed
+    wc.set_version(new_version)
+    if path_to_missile:
         path_to_missile = os.path.join(wc.working_copy, path_to_missile)
-        result = wc.build(path_to_missile=path_to_missile, output_path="/home/buildbot/build/debs")
-        RedisBackend().delete_lock("packages", name)
-        RedisBackend().create_package(name, new_version, result)
-        print "Built new:", name, branch, new_version
+    debs_path = os.path.expanduser(dd.BUILD_DEBSPATH)
+    result = wc.build(path_to_missile=path_to_missile, output_path=debs_path)
+    RedisBackend().delete_lock("packages", name)
+    RedisBackend().create_package(name, new_version, result)
+    print "Built new:", name, branch, new_version
 
     if domain is not None and stack is not None:
         RedisBackend().add_stack_package(domain, stack, name, new_version)

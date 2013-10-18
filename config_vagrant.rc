@@ -1,7 +1,7 @@
-# fabric
 BUILD_HOST = "vagrant@192.168.3.201"
 BUILD_KEY_FILENAME = "~/.vagrant.d/insecure_private_key"
 BUILD_LOGPATH = "~/build/logs"
+BUILD_DEBSPATH = "~/build/debs"
 
 REDIS_HOST = "192.168.3.201"
 REDIS_PORT = "6379"

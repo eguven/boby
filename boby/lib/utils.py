@@ -19,3 +19,16 @@ def bootstrap_packages():
     except Exception as e:
         print "Bootstrap brojects fail:", str(e)
         return {}
+
+class CD(object):
+    def __init__(self, directory=None):
+        if directory is None:
+            directory = os.getcwd()
+        self.pwd = os.getcwd()
+        self.target = os.path.expanduser(directory)
+
+    def __enter__(self):
+        os.chdir(self.target)
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        os.chdir(self.pwd)
