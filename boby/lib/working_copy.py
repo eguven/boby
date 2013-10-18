@@ -73,6 +73,9 @@ class WorkingCopy(object):
         """
         Auto-increment the version 
         """
+        if not old_version:
+            print "Building first version for %(name)s" % {"name": self.name}
+            return 1
         return str(1 + int(old_version.split("-rev")[0]))
 
     def _build_version_legacy(self, version):
