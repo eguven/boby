@@ -21,3 +21,5 @@ def create_app(config_file=None, debug=False):
     api = add_resources(Api(app))
 
     return app
+
+app = create_app()
