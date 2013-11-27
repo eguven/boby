@@ -4,16 +4,16 @@ import json
 import os
 import redis
 
-from .utils import import_config
+from .base import BaseBackend
+from ..utils import import_config
 
-dd = import_config()
 
-class RedisBackend(object):
+class RedisBackend(BaseBackend):
     """
     Handle redis operations eg. checking, listing, creating...
     """
     def __init__(self, redis_host=None):
-        self.redis_host = redis_host if redis_host else dd.REDIS_HOST
+        self.redis_host = redis_host if redis_host else import_config().REDIS_HOST
         self.redis = redis.Redis(self.redis_host)
 
         def _set(f):
@@ -30,37 +30,6 @@ class RedisBackend(object):
 
         # self.redis.original_set = self.redis.set
         self.redis.set = _set(self.redis.set)
-
-    @property
-    def domain_defaults(self):
-        return dict(
-            last_stack_version = "",
-            last_deployed_staging = "",
-            last_deployed_live = "",
-            available_packages = [],
-        )
-
-    @property
-    def stack_defaults(self):
-        return dict(
-            meta = {
-                "created_by": "Devops Engineer",
-                "created_at": datetime.datetime.utcnow().isoformat(),
-                "stable": False,
-                "deployed_staging_at": "Never",
-                "deployed_live_at": "Never",
-            },
-            packages = {},
-        )
-
-    @property
-    def build_defaults(self):
-        return dict(
-            created_by = "Devops Engineer",
-            created_at = datetime.datetime.utcnow().isoformat(),
-            branch = "",
-            commit = "",
-        )
 
     # DOMAINS
     def domain_exists(self, domain):
@@ -188,7 +157,6 @@ class RedisBackend(object):
         return max(keys).split(":")[2]
 
     # BUILDS
-
 
     # LOCKS
     def lock_exists(self, type_, name):
