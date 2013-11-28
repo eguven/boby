@@ -53,6 +53,12 @@ class Package(BaseDocument, dot_notation=True, client=client, db="boby"):
     filename = Field(str, required=True)
 
 
+class Lock(BaseDocument, dot_notation=True, client=client, db="boby"):
+    lock_type = Field(str, required=True)
+    name = Field(str, required=True)
+    created_at = Field(datetime.datetime, default=datetime.datetime.utcnow)
+
+
 class MongoBackend(BaseBackend):
     """Handle MongoDB operations"""
     def __init__(self):
@@ -158,13 +164,19 @@ class MongoBackend(BaseBackend):
 
     # LOCKS
     def lock_exists(self, type_, name):
-        pass
+        return True if Lock.find_one({"lock_type": type_, "name": name}) else False
 
     def create_lock(self, type_, name):
-        pass
+        if self.lock_exists(type_, name):
+            raise TypeError("Lock '%s:%s' exists" % (type_, name))
+        Lock(lock_type=type_, name=name).insert()
 
     def list_locks(self):
-        pass
+        locks = {}
+        for lock in Lock.find().sort("created_at", -1):
+            if lock.lock_type not in locks:
+                locks[lock_type] = []
+            locks[lock_type].append(lock)
 
     def delete_lock(self, type_, name):
-        pass
+        Lock.get_collection().remove({"lock_type": type_, "name": name})
