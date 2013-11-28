@@ -7,6 +7,7 @@ import redis
 from .base import BaseBackend
 from ..utils import import_config
 
+redis.Redis()
 
 class RedisBackend(BaseBackend):
     """
