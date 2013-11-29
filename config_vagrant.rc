@@ -3,6 +3,7 @@ BUILD_KEY_FILENAME = "~/.vagrant.d/insecure_private_key"
 BUILD_LOGPATH = "~/build/logs"
 BUILD_DEBSPATH = "~/build/debs"
 
+BACKEND = "redis"
 REDIS_HOST = "192.168.3.201"
 REDIS_PORT = "6379"
 

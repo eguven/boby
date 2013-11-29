@@ -93,7 +93,7 @@ class MongoBackend(BaseBackend):
 
     # STACKS
     def stack_exists(self, domain, stack):
-        return True if self.stacks..find_one({"domain": domain, "version": stack}) else False
+        return True if self.stacks.find_one({"domain": domain, "version": stack}) else False
 
     def create_stack(self, domain, stack):
         if self.stack_exists(domain, stack):
