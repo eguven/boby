@@ -29,9 +29,7 @@ class BaseBackend(object):
                 }, **kwargs
             )
 
-
-    @property
-    def stack_defaults(self):
+    def stack_defaults(self, **kwargs):
         if self.is_redis:
             return dict(
                 meta={
@@ -59,8 +57,7 @@ class BaseBackend(object):
                 }, **kwargs
             )
 
-    @property
-    def build_defaults(self):
+    def build_defaults(self, **kwargs):
         if self.is_redis:
             return dict(
                 created_by="DevOps Engineer",
@@ -79,8 +76,7 @@ class BaseBackend(object):
                 }, **kwargs
             )
 
-    @property
-    def deployment_defaults(self):
+    def deployment_defaults(self, **kwargs):
         if self.is_mongo:
             return dict(
                 {
@@ -93,8 +89,7 @@ class BaseBackend(object):
                 }, **kwargs
             )
 
-    @property
-    def package_defaults(self):
+    def package_defaults(self, **kwargs):
         if self.is_mongo:
             return dict(
                 {
@@ -104,8 +99,7 @@ class BaseBackend(object):
                 }, **kwargs
             )
 
-    @property
-    def lock_defaults(self):
+    def lock_defaults(self, **kwargs):
         if self.is_mongo:
             return dict(
                 {

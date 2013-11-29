@@ -5,7 +5,7 @@ from flask import Flask, request
 from flask.ext.restful import Resource, abort, reqparse
 
 from .tasks import package_build_process
-from .backends import RedisBackend, MongoBackend
+from .backends import get_backend
 from .utils import bootstrap_packages, import_config
 
 PROJECTS_DATA = {
@@ -19,24 +19,18 @@ PROJECTS_DATA = {
     },
 }
 
-BACKEND = import_config().BACKEND
-if "mongodb" == BACKEND:
-    BACKEND_CLASS = MongoBackend
-elif "redis" == BACKEND:
-    BACKEND_CLASS = RedisBackend
-
 PROJECTS_DATA.update(bootstrap_packages())
 
 class BaseResource(Resource):
     def __init__(self, *args, **kwargs):
         super(Resource, self).__init__(*args, **kwargs)
         self.reqparse = reqparse.RequestParser()
-        self.backend = BACKEND_CLASS()
+        self.backend = get_backend()
 
 
 class DomainList(BaseResource):
     def get(self):
-        return {"domains": self.backend.list_domains()}
+        return {"domains": map(lambda domain: domain["_id"], self.backend.list_domains())}
 
 class Domain(BaseResource):
     def get(self, domain):
@@ -114,7 +108,7 @@ class Build(BaseResource):
         #                       domain=domain, stack=stack)
 
     def get(self, project):
-        print project
+        return "NotImplementedBroException"
 
 class PackageList(BaseResource):
     def get(self):

@@ -89,7 +89,7 @@ class MongoBackend(BaseBackend):
         self.domains.save(d)
 
     def list_domains(self):
-        return self.domains.find()
+        return list(self.domains.find())
 
     # STACKS
     def stack_exists(self, domain, stack):
@@ -113,7 +113,7 @@ class MongoBackend(BaseBackend):
 
     def list_stacks(self, domain, detail=None):
         if detail:
-            return self.stacks.find({"domain": domain}).sort("created_at", -1)
+            return list(self.stacks.find({"domain": domain}).sort("created_at", -1))
         query = self.stacks.find({"domain": domain}, fields=["version"])
         return map(lambda doc: doc["version"], query.sort("created_at", -1))
 
@@ -138,7 +138,7 @@ class MongoBackend(BaseBackend):
     def get_package(self, package, version=None):
         if version:
             return self.packages.find_one({"name": package, "version": version})
-        return self.packages.find({"name": package}).sort("version", -1)
+        return list(self.packages.find({"name": package}).sort("version", -1))
 
     def list_packages(self):
         plist = []
@@ -161,7 +161,8 @@ class MongoBackend(BaseBackend):
         self.stacks.save(s)
 
     def get_latest_version(self, package):
-        plist = self.packages.find({"name": package}, fields=["version"]).sort("version", -1).limit(1)
+        plist = list(self.packages.find(
+            {"name": package}, fields=["version"]).sort("version", -1).limit(1))
         if plist:
             return plist[0].version
         return ""
@@ -179,10 +180,11 @@ class MongoBackend(BaseBackend):
 
     def list_locks(self):
         locks = {}
-        for lock in self.locks.find().sort("created_at", -1):
+        for lock in list(self.locks.find().sort("created_at", -1)):
             if lock["type"] not in locks:
                 locks[lock["type"]] = []
             locks[lock["type"]].append(lock)
+        return locks
 
     def delete_lock(self, type_, name):
         self.locks.remove({"type": type_, "name": name})
