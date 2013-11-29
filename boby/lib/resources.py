@@ -150,4 +150,3 @@ RESOURCES = [
 def add_resources(api):
     for resource in RESOURCES:
         api.add_resource(*resource)
-
