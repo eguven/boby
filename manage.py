@@ -35,12 +35,12 @@ def dump_config():
 @manager.command
 def cleanup_redis():
     import_config()
-    r = RedisBackend().redis
+    r = get_backend("redis")
     r.delete(*r.keys())
 
 @manager.command
 def cleanup_mongo(dbname):
-    m = MongoBackend()
+    m = get_backend("mongodb")
     m.mongo.drop_database(dbname)
 
 @manager.command

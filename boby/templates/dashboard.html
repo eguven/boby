@@ -191,15 +191,13 @@ function refreshLocks() {
       $("#lock-list").empty();
       if (data.locks.deployments) {
         data.locks.deployments.forEach(function(d) {
-          btn = $("<a class='btn btn-danger' href=''>");
-          btn.text(d);
+          btn = $("<a class='btn btn-danger' href=''>" + d.name + "<br>" + d.created_at + "<br>");
           $("#lock-list").append(btn);
         })
       }
       if (data.locks.packages) {
         data.locks.packages.forEach(function(p) {
-          btn = $("<a class='btn btn-danger' href=''>");
-          btn.text(p);
+          btn = $("<a class='btn btn-danger' href=''>" + p.name + "<br>" + p.created_at + "</a>");
           $("#lock-list").append(btn);
         })
       }
@@ -209,9 +207,9 @@ function refreshLocks() {
 
 function stackDirectoryListItem(domain, stack) {
   li = $("<li class='list-group-item'>");
-  anchor = $("<a href=/domains/" + domain + "/stacks/" + stack.name + ">");
+  anchor = $("<a href=/domains/" + domain + "/stacks/" + stack.version + ">");
   icon = $("<span class='glyphicon'>");
-  if (stack.meta.stable) {
+  if (stack.stable) {
     icon.addClass("glyphicon-ok glyphicon-green");
     li.attr("title", "stable");
   }
@@ -220,9 +218,9 @@ function stackDirectoryListItem(domain, stack) {
     li.attr("title", "not stable");
   }
   anchor.append(icon);
-  anchor.append(" &middot; Stack: " + stack.name);
+  anchor.append(" &middot; Stack: " + stack.version);
   li.append(anchor);
-  li.append($("<span class='label label-default pull-right'>" + stack.meta.created_at.split(".")[0] + " UTC</span>"))
+  li.append($("<span class='label label-default pull-right'>" + stack.created_at.split(".")[0] + " UTC</span>"))
   return li
 }
 
@@ -249,7 +247,7 @@ $("#create-domain-button").click(addNewDomain);
 $("#create-stack-button").click(addNewStack);
 $("#build-package-button").click(buildPackage);
 $("#stack-target-domain").change(refreshSourceStacks);
-$("#stack-directory-domain").change(refreshStackDirectory);
+$("#stack-directory-domain").blur(refreshStackDirectory);
 
 
 </script>

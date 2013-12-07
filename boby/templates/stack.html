@@ -53,6 +53,13 @@ function checkDataReady() {
   return true
 }
 
+function checkLockExists(lname) {
+  if (-1 != packageLocks.map(function(d){return d.name}).indexOf(lname)) {
+    return true
+  }
+  return false
+}
+
 function renderStackData() {
   if (!checkDataReady()) {
     console.log("Setting timeout for render");
@@ -76,7 +83,7 @@ function renderStackData() {
       $("<br><small>" + stackPackages[pkg]+ "</small>").appendTo(btn);
       btn.appendTo(p);
     }
-    if (packageLocks.indexOf(pkg) != -1) {
+    if (checkLockExists(pkg) == true) {
       btn.removeClass("btn-default btn-success");
       btn.addClass("btn-danger");
     }
