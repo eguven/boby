@@ -29,6 +29,10 @@ The build machine needs to have installed `trebuchet`:
     $ sudo python setup.py install
     $ trebuchet --version
 
+Setup Notes
+===========
+
+    $HOME/build/logs
 
 Todo
 ====
