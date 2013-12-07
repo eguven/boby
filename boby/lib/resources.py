@@ -25,6 +25,7 @@ import pprint
 pp = pprint.PrettyPrinter(indent=2)
 pp.pprint(PROJECTS_DATA)
 
+
 class BaseResource(Resource):
     def __init__(self, *args, **kwargs):
         super(Resource, self).__init__(*args, **kwargs)
@@ -35,6 +36,7 @@ class BaseResource(Resource):
 class DomainList(BaseResource):
     def get(self):
         return {"domains": map(lambda domain: domain["_id"], self.backend.list_domains())}
+
 
 class Domain(BaseResource):
     def get(self, domain):
@@ -48,6 +50,7 @@ class Domain(BaseResource):
         except TypeError as e:
             abort(409, status=409, message="Conflict", info=str(e))
 
+
 class StackList(BaseResource):
     def get(self, domain):
         self.reqparse.add_argument("detail", type=str)
@@ -57,6 +60,7 @@ class StackList(BaseResource):
         else:
             stacks = self.backend.list_stacks(domain)
         return {"stacks": stacks}
+
 
 class Stack(BaseResource):
     def get(self, domain, stack):
@@ -81,6 +85,7 @@ class Stack(BaseResource):
                 abort(400, status=400, message=repr(e))
         return {"status": 201, "message": "Created"}
 
+
 class Build(BaseResource):
     def put(self, project):
         self.reqparse.add_argument("branch", type=str, default="master")
@@ -88,7 +93,7 @@ class Build(BaseResource):
         self.reqparse.add_argument("stack", type=str)
         args = self.reqparse.parse_args()
         branch, domain, stack = args["branch"], args["domain"], args["stack"]
-        
+
         if domain and stack:
             if not self.backend.stack_exists(domain, stack):
                 abort(404, status=404, message="Not Found", info="Domain and/or stack does not exist")
@@ -103,8 +108,8 @@ class Build(BaseResource):
         p = Process(target=package_build_process,
                     args=(project, PROJECTS_DATA[project]["repo"], branch),
                     kwargs={"path_to_missile": PROJECTS_DATA[project].get("missile", ".missile.yml"),
-                            "domain": domain, "stack":stack},
-                   )
+                            "domain": domain, "stack": stack},
+                    )
         p.start()
         return {"status": 201, "message": "Created"}
         # package_build_process.delay(project, PROJECTS_DATA[project]["repo"],
@@ -115,9 +120,11 @@ class Build(BaseResource):
     def get(self, project):
         return "NotImplementedBroException"
 
+
 class PackageList(BaseResource):
     def get(self):
         return {"packages": self.backend.list_packages()}
+
 
 class Package(BaseResource):
     def get(self, package):
@@ -128,6 +135,7 @@ class Package(BaseResource):
         if not package:
             abort(404, status=404, message="Not Found", info="Package not found")
         return package if not version else {version: package}
+
 
 class LockList(BaseResource):
 
@@ -153,6 +161,7 @@ RESOURCES = [
     (Package, "/api/packages/<string:package>"),
     (LockList, "/api/locks/"),
 ]
+
 
 def add_resources(api):
     for resource in RESOURCES:

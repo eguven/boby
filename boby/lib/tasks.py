@@ -25,12 +25,14 @@ if not BACKEND.get_domain("main"):
 if not get_backend().get_domain("main")["available_packages"]:
     BACKEND.update_domain("main", available_packages=["test_config", "test_application"])
 
+
 def send_notification(data):
     """
     Send notification using Pubsub Redis
     """
     red = Redis(dd.REDIS_HOST, int(dd.REDIS_PORT))
     red.publish("all", ['publish', data])
+
 
 def package_build_process(name, url, branch, path_to_missile=None,
                           domain=None, stack=None):

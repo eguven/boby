@@ -9,6 +9,7 @@ from ..utils import import_config
 
 redis.Redis()
 
+
 class RedisBackend(BaseBackend):
     """
     Handle redis operations eg. checking, listing, creating...

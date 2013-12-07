@@ -15,6 +15,7 @@ except Exception as e:
     sys.stderr.write(str(e))
     REDIS_OK = False
 
+
 @unittest.skipUnless(REDIS_OK, "REDIS is not there")
 class BackendsDomainTestCase(unittest.TestCase):
     def cleanup(self):
@@ -55,4 +56,3 @@ class BackendsStackTestCase(unittest.TestCase):
         self.assertTrue("meta" in defaults and "packages" in defaults)
         for k in self.backend.stack_defaults["meta"]:
             self.assertTrue(k in meta_keys)
-

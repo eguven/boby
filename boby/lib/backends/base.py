@@ -40,11 +40,11 @@ class BaseBackend(object):
                     "deployed_live_at": "Never",
                 },
                 packages={},
-        )
+            )
         elif self.is_mongo:
             return dict(
                 {
-                # _id is auto by MongoDB
+                    # _id is auto by MongoDB
                     "domain": "",
                     "version": "",
                     "created_by": "DevOps Engineer",

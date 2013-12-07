@@ -5,6 +5,7 @@ from subprocess import call, check_output
 
 from .utils import CD
 
+
 class WorkingCopy(object):
     """
     WorkingCopy object handles directory creation, fetching repo,
@@ -75,7 +76,7 @@ class WorkingCopy(object):
 
     def generate_new_base_version(self, old_version):
         """
-        Auto-increment the version 
+        Auto-increment the version
         """
         if not old_version:
             print "Building first version for %(name)s" % {"name": self.name}
