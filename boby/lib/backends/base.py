@@ -25,7 +25,7 @@ class BaseBackend(object):
                 {
                     "_id": "",
                     "last_stack_version": "",
-                    "available_packages": "",
+                    "available_packages": [],
                 }, **kwargs
             )
 
@@ -105,6 +105,6 @@ class BaseBackend(object):
                 {
                     "type": "",
                     "name": "",
-                    "created_at": "",
+                    "created_at": datetime.datetime.utcnow(),
                 }, **kwargs
             )

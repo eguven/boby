@@ -11,15 +11,19 @@ from .utils import bootstrap_packages, import_config
 PROJECTS_DATA = {
     'test_config': {
         'repo': 'git@github.com:ops-hero/test_config.git',
-        'path_to_missile': None
+        'missile': None
     },
     'test_application': {
         'repo': 'git@github.com:ops-hero/test_application.git',
-        'path_to_missile': None
+        'missile': None
     },
 }
 
 PROJECTS_DATA.update(bootstrap_packages())
+
+import pprint
+pp = pprint.PrettyPrinter(indent=2)
+pp.pprint(PROJECTS_DATA)
 
 class BaseResource(Resource):
     def __init__(self, *args, **kwargs):
@@ -56,6 +60,7 @@ class StackList(BaseResource):
 
 class Stack(BaseResource):
     def get(self, domain, stack):
+        print "Getting: %s:%s" % (domain, stack)
         stack = self.backend.get_stack(domain, stack)
         return stack if stack else abort(404, status=404, info="Stack not found")
 
@@ -97,7 +102,7 @@ class Build(BaseResource):
         from multiprocessing import Process
         p = Process(target=package_build_process,
                     args=(project, PROJECTS_DATA[project]["repo"], branch),
-                    kwargs={"path_to_missile": PROJECTS_DATA[project]["path_to_missile"],
+                    kwargs={"path_to_missile": PROJECTS_DATA[project].get("missile", ".missile.yml"),
                             "domain": domain, "stack":stack},
                    )
         p.start()

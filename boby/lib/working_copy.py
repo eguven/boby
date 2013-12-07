@@ -1,5 +1,6 @@
 import json
 import os
+from cStringIO import StringIO
 from subprocess import call, check_output
 
 from .utils import CD
@@ -42,7 +43,7 @@ class WorkingCopy(object):
         # with lcd(self.working_copy):
         with CD(self.working_copy):
             call("git fetch --quiet origin", shell=True)
-            call("git reset --quiet --hard origin/%s" % branch, shell=True)
+            call("git reset --quiet --hard origin/%s || git reset --quiet --hard %s" % (branch, branch), shell=True)
             call("git submodule --quiet init", shell=True)
             call("git submodule --quiet update", shell=True)
 
@@ -88,19 +89,29 @@ class WorkingCopy(object):
         vline = "--app-version %(v)s --env-version %(v)s --service-version %(v)s"
         return vline % {"v": version}
 
-    def build(self, path_to_missile=None, output_path=None):
+    def build(self, path_to_missile=None, output_path=None, logpath=None):
         """
         Run trebuchet build
         """
         assert self.version, "version not set"
+        assert logpath, "logfile not specified"
+        errlog = open(logpath.replace(".log", ".err"), "a")
         if path_to_missile is None:
             path_to_missile = self.default_missile_path
         version = self._build_version_legacy(self.version)
         cmd = "trebuchet build %(missile)s --arch amd64 --output %(output)s %(version)s"
         results = check_output(cmd % {"missile": path_to_missile, "output": output_path,
                                "version": version},
-                               shell=True)
+                               shell=True, stderr=errlog, bufsize=0)
+        errlog.close()
         retval = []
+        with open(logpath, "a") as logfile:
+            logfile.write(results)
+            logfile.write("\nBREAK\n")
+            logfile.write(str(filter(lambda l: l.startswith("Built: "), results.split("\n"))))
         for pkg in filter(lambda l: l.startswith("Built: "), results.split("\n")):
-            retval.append(json.loads("""%s""" % pkg[7:].replace("'", '"')))
+            try:
+                retval.append(json.loads("""%s""" % pkg[7:].replace("'", '"')))
+            except Exception as e:
+                print "\n", repr(e), "Str:", pkg
         return retval

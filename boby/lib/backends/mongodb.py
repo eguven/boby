@@ -67,8 +67,8 @@ class MongoBackend(BaseBackend):
         self.stacks = self.db["stack"]
         self.builds = self.db["build"]
         self.deployments = self.db["deployment"]
-        self.packages = self.db["packages"]
-        self.locks = self.db["locks"]
+        self.packages = self.db["packag"]
+        self.locks = self.db["lock"]
 
     # DOMAINS
     def domain_exists(self, domain):
@@ -103,7 +103,7 @@ class MongoBackend(BaseBackend):
         self.stacks.insert(self.stack_defaults(domain=domain, version=stack))
 
     def get_stack(self, domain, stack):
-        return self.stacks.find_one({"domain": domain, "stack": stack})
+        return self.stacks.find_one({"domain": domain, "version": stack})
 
     def update_stack(self, domain, stack, **kwargs):
         s = self.get_stack(domain, stack)
@@ -121,8 +121,8 @@ class MongoBackend(BaseBackend):
         assert (domain and source and dest), "domain, source, dest are required kwargs"
         assert source != dest, "Source and destination are the same, '%s'" % source
         d_stack = self.get_stack(domain, dest)
-        if d_stack.frozen:
-            raise TypeError("Dest. stack: %s:%s is frozen" % (d_stack.domain, d_stack._id))
+        if d_stack["frozen"]:
+            raise TypeError("Dest. stack: %s:%s is frozen" % (d_stack["domain"], d_stack["version"]))
         s_stack = self.get_stack(domain, source)
         self.update_stack(domain, dest, packages=s_stack["packages"])
 
@@ -132,7 +132,7 @@ class MongoBackend(BaseBackend):
 
     def create_package(self, package, version, filename):
         if self.package_exists(package, version):
-            raise TypeError("Package '%s:%s' exists" % (package, version))
+            print "Package '%s:%s' exists! Replacing..." % (package, version)
         self.packages.insert(self.package_defaults(name=package, version=version, filename=filename))
 
     def get_package(self, package, version=None):
@@ -143,8 +143,8 @@ class MongoBackend(BaseBackend):
     def list_packages(self):
         plist = []
         for package in self.packages.find(fields=["name"]):
-            if package.name not in plist:
-                plist.append(package.name)
+            if package["name"] not in plist:
+                plist.append(package["name"])
         return plist
 
     def available_packages(self, domain):
@@ -153,25 +153,26 @@ class MongoBackend(BaseBackend):
             raise TypeError("Domain '%s' does not exist" % domain)
         return d["available_packages"]
 
-    def add_stack_package(self, domain, stack, pkg_name, pkg_version):
+    def add_stack_package(self, domain, stack, pkg_dict):
         s = self.get_stack(domain, stack)
         if not s:
             raise TypeError("Stack %s:%s does not exist" % (domain, stack))
-        s.packages[pkg_name] = pkg_version
+        pkg_name = pkg_dict.pop("name")
+        s["packages"][pkg_name] = pkg_dict
         self.stacks.save(s)
 
     def get_latest_version(self, package):
         plist = list(self.packages.find(
             {"name": package}, fields=["version"]).sort("version", -1).limit(1))
         if plist:
-            return plist[0].version
+            return plist[0]["version"]
         return ""
 
     # BUILDS
 
     # LOCKS
     def lock_exists(self, type_, name):
-        return True if self.locks.find_one({"lock_type": type_, "name": name}) else False
+        return True if self.locks.find_one({"type": type_, "name": name}) else False
 
     def create_lock(self, type_, name):
         if self.lock_exists(type_, name):

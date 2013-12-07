@@ -4,7 +4,7 @@ import sys
 import datetime
 from redis import Redis
 
-from .backends import RedisBackend
+from .backends import get_backend
 from .working_copy import WorkingCopy
 from .utils import import_config
 
@@ -19,10 +19,11 @@ key_filename = None if not hasattr(dd, "BUILD_KEY_FILENAME") else dd.BUILD_KEY_F
 host = dd.BUILD_HOST
 
 # TODO REMOVE - FOR EASY TESTING
-if not RedisBackend().get_domain("main"):
-    RedisBackend().create_domain("main")
-if not RedisBackend().get_domain("main")["available_packages"]:
-    RedisBackend().update_domain("main", available_packages=["test_config", "test_application"])
+BACKEND = get_backend()
+if not BACKEND.get_domain("main"):
+    BACKEND.create_domain("main")
+if not get_backend().get_domain("main")["available_packages"]:
+    BACKEND.update_domain("main", available_packages=["test_config", "test_application"])
 
 def send_notification(data):
     """
@@ -38,18 +39,18 @@ def package_build_process(name, url, branch, path_to_missile=None,
     """
     logfilename = "build-%s-%s-%s.log" % (name, branch, datetime.datetime.utcnow().isoformat())
     logfilepath = os.path.expanduser(os.path.join(dd.BUILD_LOGPATH, logfilename))
-    sys.stdout = open(logfilepath, "w")
+    sys.stdout = open(logfilepath, "a")
     sys.stderr = sys.stdout
 
     args = ["name", "url", "branch", "path_to_missile"]
     for arg in args:
-        print arg , ": ", locals()[arg]
+        print arg, ":", locals()[arg]
 
     # with settings(host_string=host, key_filename=key_filename):
     wc = WorkingCopy(name, base_folder=os.path.expanduser("~/build"), repo=url)
     wc.prepare(branch=branch)
 
-    latest_version = RedisBackend().get_latest_version(name)
+    latest_version = BACKEND.get_latest_version(name)
     new_base_version = wc.generate_new_base_version(latest_version)
 
     new_version = wc.get_new_git_version(prefix=new_base_version, suffix=branch)
@@ -58,11 +59,12 @@ def package_build_process(name, url, branch, path_to_missile=None,
     if path_to_missile:
         path_to_missile = os.path.join(wc.working_copy, path_to_missile)
     debs_path = os.path.expanduser(dd.BUILD_DEBSPATH)
-    result = wc.build(path_to_missile=path_to_missile, output_path=debs_path)
-    RedisBackend().delete_lock("packages", name)
-    RedisBackend().create_package(name, new_version, result)
-    print "Built new:", name, branch, new_version
+    result = wc.build(path_to_missile=path_to_missile, output_path=debs_path, logpath=logfilepath)
+    BACKEND.delete_lock("packages", name)
+    for build_dict in result:
+        print "BUILD DICT IS:", build_dict
+        BACKEND.create_package(build_dict["name"], build_dict["version"], build_dict["file_name"])
 
-    if domain is not None and stack is not None:
-        RedisBackend().add_stack_package(domain, stack, name, new_version)
-        print "Added to 'domains:%s:stacks:%s:packages' as {'%s': '%s'}" % (domain, stack, name, new_version)
+        if domain is not None and stack is not None:
+            BACKEND.add_stack_package(domain, stack, build_dict)
+            print "Added to 'domains:%s:stacks:%s:packages' as {'%s': '%s'}" % (domain, stack, name, new_version)
