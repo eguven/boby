@@ -163,7 +163,13 @@ class MongoBackend(BaseBackend):
         self.stacks.save(s)
 
     def get_latest_version(self, project):
-        package = self.get_packages_dictionary(project=project)["packages"][0]
+        try:
+            package = self.get_packages_dictionary(project=project)["packages"][0]
+        except TypeError:
+            return ""
+        except IndexError as e:
+            print "Critical, get_latest_version, %s" % (project, repr(e))
+            return ""
         plist = list(self.packages.find(
             {"name": package}, fields=["version"]).sort("version", -1).limit(1))
         if plist:
