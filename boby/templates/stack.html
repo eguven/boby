@@ -1,5 +1,13 @@
 {% extends "base.html" %}
 
+{% block styles %}
+<style type="text/css">
+  .btn {
+    margin: 2px;
+  }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="container">
   <div class="stack-block">
@@ -41,7 +49,7 @@ function getData() {
   jQuery.ajax({
     url: "/api/domains/{{ domain }}",
     success: function(data, status, jqXHR) {
-      availablePackages = data.available_packages;
+      availablePackages = data.available_packages.sort();
     }
   });
   // Packages dictionary
@@ -134,6 +142,17 @@ function renderStackData() {
 
 getData();
 renderStackData();
+
+function killLock(project) {
+  jQuery.ajax({
+    url: "/api/locks/",
+    data: {type: "packages", name: project},
+    type: "DELETE",
+    success: function() {
+      window.location.reload()
+    }
+  })
+}
 
 </script>
 {% endblock scripts %}
