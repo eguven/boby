@@ -2,7 +2,6 @@ import pymongo
 
 from .base import BaseBackend
 
-
 # class Domain(BaseDocument, dot_notation=True, client=client, db="boby"):
 #     _id = Field(str)
 #     last_stack_version = Field(str, default="")
@@ -67,7 +66,7 @@ class MongoBackend(BaseBackend):
         self.stacks = self.db["stack"]
         self.builds = self.db["build"]
         self.deployments = self.db["deployment"]
-        self.packages = self.db["packag"]
+        self.packages = self.db["package"]
         self.locks = self.db["lock"]
 
     # DOMAINS

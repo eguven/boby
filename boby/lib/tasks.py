@@ -39,7 +39,8 @@ def package_build_process(name, url, branch, path_to_missile=None,
     """
     Prepare working copy, checkout working copy, build
     """
-    logfilename = "build-%s-%s-%s.log" % (name, branch, datetime.datetime.utcnow().isoformat())
+    now = datetime.datetime.utcnow().isoformat().split(".")[0]
+    logfilename = "build-%s-%s-%s.log" % (name, branch, now)
     logfilepath = os.path.expanduser(os.path.join(dd.BUILD_LOGPATH, logfilename))
     sys.stdout = open(logfilepath, "a")
     sys.stderr = sys.stdout

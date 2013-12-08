@@ -60,17 +60,29 @@ function checkLockExists(lname) {
   return false
 }
 
+  function getVersionInStack(project) {
+    if (typeof packagesDictionary[project] == "undefined") {
+      return
+    }
+    if (0 < packagesDictionary[project].packages.length) {
+      pkg_name = packagesDictionary[project].packages[0];
+      return stackPackages[pkg_name].version;
+    }
+    return
+  }
+
 function renderStackData() {
   if (!checkDataReady()) {
     console.log("Setting timeout for render");
-    window.setTimeout(renderStackData, 0.05);
+    window.setTimeout(renderStackData, 0.1);
     return
   }
 
   p = $("#stack-packages-block");
   p.empty();
   availablePackages.forEach(function(pkg) {
-    if (typeof stackPackages[pkg] == "undefined") {
+    version = getVersionInStack(pkg)
+    if (!version) {
       // gray button
       btn = $("<button class='btn btn-lg btn-default'>");
       btn.text(pkg);
@@ -80,7 +92,7 @@ function renderStackData() {
     else {
       btn = $("<button class='btn btn-lg btn-success'>");
       btn.text(pkg)
-      $("<br><small>" + stackPackages[pkg]+ "</small>").appendTo(btn);
+      $("<br><small>" + version + "</small>").appendTo(btn);
       btn.appendTo(p);
     }
     if (checkLockExists(pkg) == true) {
@@ -93,15 +105,19 @@ function renderStackData() {
         console.log("Cancelled build");
         return
       }
-      $(this).removeClass("btn-success btn-default");
-      $(this).addClass("btn-danger");
       jQuery.ajax({
         url: "/api/builds/" + pkg,
         data: {domain: "{{ domain }}", stack: "{{ stack }}", branch: branch},
         type: "PUT",
         success: function() {
-          console.log("Sent rebuild request for " + pkg)
-        }
+          console.log("Sent rebuild request for " + pkg);
+          window.location.reload();
+          $(this).removeClass("btn-success btn-default");
+          $(this).addClass("btn-danger");
+        },
+        error: function() {
+          alert("Cancelled build, there is a build in progress");
+        },
       })
     });
     p.append(" ");

@@ -64,7 +64,6 @@ class StackList(BaseResource):
 
 class Stack(BaseResource):
     def get(self, domain, stack):
-        print "Getting: %s:%s" % (domain, stack)
         stack = self.backend.get_stack(domain, stack)
         return stack if stack else abort(404, status=404, info="Stack not found")
 
@@ -131,10 +130,10 @@ class Package(BaseResource):
         self.reqparse.add_argument("version", type=str)
         args = self.reqparse.parse_args()
         version = args["version"]
-        package = self.backend.get_package(package, version=version)
-        if not package:
+        data = self.backend.get_package(package, version=version)
+        if not data:
             abort(404, status=404, message="Not Found", info="Package not found")
-        return package if not version else {version: package}
+        return {package: data} if not version else data
 
 
 class LockList(BaseResource):
