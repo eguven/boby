@@ -1,6 +1,7 @@
 import pymongo
 
 from .base import BaseBackend
+from ..utils import get_build_lock_share
 
 # class Domain(BaseDocument, dot_notation=True, client=client, db="boby"):
 #     _id = Field(str)
@@ -172,12 +173,17 @@ class MongoBackend(BaseBackend):
 
     # LOCKS
     def lock_exists(self, type_, name):
+        if isinstance(name, list):
+            lcount = self.locks.find({"type": type_, "name": {"$in": name}}).count()
+            return True if lcount else False
         return True if self.locks.find_one({"type": type_, "name": name}) else False
 
     def create_lock(self, type_, name):
-        if self.lock_exists(type_, name):
+        locks = get_build_lock_share(name)
+        if self.lock_exists(type_, locks):
             raise TypeError("Lock '%s:%s' exists" % (type_, name))
-        self.locks.insert(self.lock_defaults(type=type_, name=name))
+        for lock in locks:
+            self.locks.insert(self.lock_defaults(type=type_, name=lock))
 
     def list_locks(self):
         locks = {}
@@ -188,7 +194,9 @@ class MongoBackend(BaseBackend):
         return locks
 
     def delete_lock(self, type_, name):
-        self.locks.remove({"type": type_, "name": name})
+        locks = get_build_lock_share(name)
+        self.locks.remove({"type": type_, "name": {"$in": locks}})
+
     # PACKAGES_DICTIONARY
     def get_packages_dictionary(self, project=None):
         if project:

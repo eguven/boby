@@ -64,3 +64,15 @@ def json_sanitizer(obj):
         return outdict
     converters.update({list: list_sanitizer, dict: dict_sanitizer})
     return dict_sanitizer(obj)
+
+
+def get_build_lock_share(project):
+    """Return a list of projects that should share a build lock (same repo)"""
+    projects = bootstrap_packages()
+    repo = projects[project]["repo"]
+    lock_list = []
+    for k, v in projects.items():
+        if repo == v["repo"]:
+            lock_list.append(k)
+    print "Lock list for %s is: %s" % (project, lock_list)
+    return lock_list
