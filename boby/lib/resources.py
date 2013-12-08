@@ -158,7 +158,7 @@ class PackagesDictionary(BaseResource):
         if args["project"] is not None:
             data = self.backend.get_packages_dictionary(project=args["project"])
             data.pop("_id")
-            return {project: data}
+            return {args["project"]: data}
         for project in self.backend.get_packages_dictionary():
             k = project.pop("_id")
             retval[k] = project

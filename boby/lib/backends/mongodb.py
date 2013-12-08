@@ -162,7 +162,8 @@ class MongoBackend(BaseBackend):
         s["packages"][pkg_name] = pkg_dict
         self.stacks.save(s)
 
-    def get_latest_version(self, package):
+    def get_latest_version(self, project):
+        package = self.get_packages_dictionary(project=project)["packages"][0]
         plist = list(self.packages.find(
             {"name": package}, fields=["version"]).sort("version", -1).limit(1))
         if plist:
@@ -207,7 +208,7 @@ class MongoBackend(BaseBackend):
     # PACKAGES_DICTIONARY
     def get_packages_dictionary(self, project=None):
         if project:
-            return self.dictionary.findOne(project)
+            return self.dictionary.find_one(project)
         return self.dictionary.find().sort("_id", 1)
 
     def update_packages_dictionary(self, project, packages):
