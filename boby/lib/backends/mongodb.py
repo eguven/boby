@@ -170,6 +170,13 @@ class MongoBackend(BaseBackend):
         return ""
 
     # BUILDS
+    def create_build(self, project, branch, commit):
+        build = self.build_defaults(project=project, branch=branch, commit=commit)
+        return self.builds.insert(build)
+
+    def mark_build_finished(self, _id):
+        self.builds.update({"_id": _id},
+                           {"$set": {"finished_at": datetime.datetime.utcnow()}})
 
     # LOCKS
     def lock_exists(self, type_, name):

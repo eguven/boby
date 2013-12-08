@@ -71,8 +71,11 @@ class BaseBackend(object):
                     # _id is auto by MongoDB
                     "created_by": "DevOps Engineer",
                     "created_at": datetime.datetime.utcnow(),
+                    "finished_at": None,
+                    "project": "",
                     "branch": "",
                     "commit": "",
+                    "logs": [],
                 }, **kwargs
             )
 
