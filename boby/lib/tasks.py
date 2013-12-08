@@ -64,10 +64,14 @@ def package_build_process(name, url, branch, path_to_missile=None,
     debs_path = os.path.expanduser(dd.BUILD_DEBSPATH)
     result = wc.build(path_to_missile=path_to_missile, output_path=debs_path, logpath=logfilepath)
     BACKEND.delete_lock("packages", name)
+    # for project name: packages mapping
+    packages = []
     for build_dict in result:
         print "BUILD DICT IS:", build_dict
         BACKEND.create_package(build_dict["name"], build_dict["version"], build_dict["file_name"])
+        packages.append(build_dict["name"])
 
         if domain is not None and stack is not None:
             BACKEND.add_stack_package(domain, stack, build_dict)
             print "Added to 'domains:%s:stacks:%s:packages' as {'%s': '%s'}" % (domain, stack, name, new_version)
+    BACKEND.update_packages_dictionary(name, sorted(packages))

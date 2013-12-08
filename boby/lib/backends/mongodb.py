@@ -68,6 +68,7 @@ class MongoBackend(BaseBackend):
         self.deployments = self.db["deployment"]
         self.packages = self.db["package"]
         self.locks = self.db["lock"]
+        self.dictionary = self.db["dictionary"]
 
     # DOMAINS
     def domain_exists(self, domain):
@@ -188,3 +189,12 @@ class MongoBackend(BaseBackend):
 
     def delete_lock(self, type_, name):
         self.locks.remove({"type": type_, "name": name})
+    # PACKAGES_DICTIONARY
+    def get_packages_dictionary(self, project=None):
+        if project:
+            return self.dictionary.findOne(project)
+        return self.dictionary.find().sort("_id", 1)
+
+    def update_packages_dictionary(self, project, packages):
+        doc = self.dictionary_defaults(_id=project, packages=packages)
+        self.dictionary.save(doc)

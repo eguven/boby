@@ -44,10 +44,17 @@ function getData() {
       availablePackages = data.available_packages;
     }
   });
+  // Packages dictionary
+  jQuery.ajax({
+    url: "/api/dictionary",
+    success: function(data, status, jqXHR) {
+      packagesDictionary = data;
+    }
+  });
 }
 
 function checkDataReady() {
-  if (typeof availablePackages == "undefined" || typeof packageLocks == "undefined" || typeof stackData == "undefined") {
+  if (typeof availablePackages == "undefined" || typeof packageLocks == "undefined" || typeof stackData == "undefined" || typeof packagesDictionary == "undefined") {
     return false
   }
   return true

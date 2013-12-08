@@ -150,6 +150,21 @@ class LockList(BaseResource):
         return flask.Response(status=204)
 
 
+class PackagesDictionary(BaseResource):
+    def get(self):
+        self.reqparse.add_argument("project", type=str)
+        args = self.reqparse.parse_args()
+        retval = {}
+        if args["project"] is not None:
+            data = self.backend.get_packages_dictionary(project=args["project"])
+            data.pop("_id")
+            return {project: data}
+        for project in self.backend.get_packages_dictionary():
+            k = project.pop("_id")
+            retval[k] = project
+        return retval
+
+
 RESOURCES = [
     (DomainList, "/api/domains/"),
     (Domain, "/api/domains/<string:domain>"),
@@ -159,6 +174,7 @@ RESOURCES = [
     (PackageList, "/api/packages/"),
     (Package, "/api/packages/<string:package>"),
     (LockList, "/api/locks/"),
+    (PackagesDictionary, "/api/dictionary"),
 ]
 
 

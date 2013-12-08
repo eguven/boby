@@ -108,3 +108,13 @@ class BaseBackend(object):
                     "created_at": datetime.datetime.utcnow(),
                 }, **kwargs
             )
+
+    def dictionary_defaults(self, **kwargs):
+        if self.is_mongo:
+            return dict(
+                {
+                    "_id": "",
+                    "packages": [],
+                    "last_updated": datetime.datetime.utcnow(),
+                }, **kwargs
+            )
